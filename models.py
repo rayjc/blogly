@@ -5,7 +5,6 @@ db = SQLAlchemy()
 
 def connect_db(app):
     """Connect to database."""
-
     db.app = app
     db.init_app(app)
 
@@ -24,3 +23,8 @@ class User(db.Model):
         db.CheckConstraint("image_url LIKE 'http%'"),
         # db.UniqueConstraint('first_name', 'last_name', name='unique_person'),
     )
+
+    def __repr__(self):
+        return (f"<User: first_name={self.first_name} "
+                f"last_name={self.last_name} "
+                f"hasImage={'yes' if self.image_url else 'no'}>")

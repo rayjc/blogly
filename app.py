@@ -10,7 +10,7 @@ app = Flask(__name__)
 # database setup
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///blogly'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = True
+# app.config['SQLALCHEMY_ECHO'] = True
 connect_db(app)
 db.create_all()
 # debug setup
@@ -56,7 +56,7 @@ def new_user_view():
             db.session.add(new_user)
             db.session.commit()
         except exc.SQLAlchemyError:
-            return redirect('new_user_view')
+            return redirect(url_for('new_user_view'))
         return redirect(url_for('users_view'))
 
     return render_template('new_user.html')
@@ -96,7 +96,7 @@ def edit_user_view(user_id):
             db.session.add(user)
             db.session.commit()
         except exc.SQLAlchemyError:
-            return redirect(url_for('edit_user_view'))
+            return redirect(url_for('edit_user_view', user_id=user_id))
         return redirect(url_for('user_detail_view', user_id=user_id))
 
     return render_template('edit_user.html', user=User.query.get(user_id))
@@ -112,5 +112,9 @@ def delete_user(user_id):
         db.session.delete(User.query.get(user_id))
         db.session.commit()
     except exc.SQLAlchemyError:
-        return redirect(url_for('user_detail_view', user_id=user_id))
+        return (
+            redirect(url_for('user_detail_view', user_id=user_id))
+            if User.query.get(user_id) else
+            redirect(url_for('users_view'))
+        )
     return redirect(url_for('users_view'))

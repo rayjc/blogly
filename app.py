@@ -33,7 +33,10 @@ def users_view():
     """
     Show all users; links each user to detail page; includes a link to add user.
     """
-    return render_template('users.html', users=User.query.all())
+    return render_template(
+        'users.html',
+        users=User.query.order_by(User.last_name, User.first_name).all()
+    )
 
 
 @app.route('/users/new', methods=['GET', 'POST'])
@@ -68,7 +71,7 @@ def user_detail_view(user_id):
     Display user details (name, image) and buttons to edit or delete user.
     """
     return render_template(
-        'user_detail.html', user=User.query.get(user_id),
+        'user_detail.html', user=User.query.get_or_404(user_id),
         edit_url=url_for('edit_user_view', user_id=user_id),
         delete_url=url_for('delete_user', user_id=user_id)
     )
@@ -88,7 +91,7 @@ def edit_user_view(user_id):
         last_name = request.form.get('last_name')
         url = request.form.get('image_url')
         try:
-            user = User.query.get(user_id)
+            user = User.query.get_or_404(user_id)
             user.first_name = first_name
             user.last_name = last_name
             if url:
@@ -109,7 +112,7 @@ def delete_user(user_id):
     else redirect back to this page.
     """
     try:
-        db.session.delete(User.query.get(user_id))
+        db.session.delete(User.query.get_or_404(user_id))
         db.session.commit()
     except exc.SQLAlchemyError:
         return (

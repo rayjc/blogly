@@ -28,3 +28,10 @@ class User(db.Model):
         return (f"<User: first_name={self.first_name} "
                 f"last_name={self.last_name} "
                 f"hasImage={'yes' if self.image_url else 'no'}>")
+
+    @property
+    def full_name(self):
+        """
+        Return full name: first_name + last_name
+        """
+        return f"{self.first_name} {self.last_name}"

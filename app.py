@@ -1,11 +1,11 @@
 """Blogly application."""
 import datetime
 
-from flask import Flask, redirect, render_template, url_for, request
+from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_debugtoolbar import DebugToolbarExtension
-from sqlalchemy import exc
 
-from models import User, connect_db, db, Post
+from models import Post, User, connect_db, db
+from sqlalchemy import exc
 
 app = Flask(__name__)
 # database setup
@@ -19,6 +19,9 @@ db.create_all()
 app.config['SECRET_KEY'] = "test"
 app.debug = True
 tool_bar = DebugToolbarExtension(app)
+
+def isValid(text):
+    return text.isalnum()
 
 @app.template_filter('datetime')
 def format_datetime(value):
@@ -66,6 +69,14 @@ def new_user_view():
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
         url = request.form.get('image_url')
+        if not isValid(first_name) or not isValid(last_name):
+            flash(
+                'Invalid characters detected! '
+                'Please only use alphabetical letters or numbers.',
+                'danger'
+            )
+            return redirect(url_for('new_user_view'))
+
         try:
             new_user = (
                 User(first_name=first_name, last_name=last_name, image_url=url) if url
@@ -73,7 +84,9 @@ def new_user_view():
             )
             db.session.add(new_user)
             db.session.commit()
+            flash('Success: user created!', 'success')
         except exc.SQLAlchemyError:
+            flash('Failed to add user', 'danger')
             return redirect(url_for('new_user_view'))
         return redirect(url_for('users_view'))
 
@@ -107,6 +120,14 @@ def edit_user_view(user_id):
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
         url = request.form.get('image_url')
+        if not isValid(first_name) or not isValid(last_name):
+            flash(
+                'Invalid characters detected! '
+                'Please only use alphabetical letters or numbers.',
+                'danger'
+            )
+            return redirect(url_for('new_user_view'))
+
         try:
             user = User.query.get_or_404(user_id)
             user.first_name = first_name
@@ -115,7 +136,9 @@ def edit_user_view(user_id):
                 user.image_url = url
             db.session.add(user)
             db.session.commit()
+            flash('Success: user updated!', 'success')
         except exc.SQLAlchemyError:
+            flash('Failed to update user', 'danger')
             return redirect(url_for('edit_user_view', user_id=user_id))
         return redirect(url_for('user_detail_view', user_id=user_id))
 
@@ -131,7 +154,9 @@ def delete_user(user_id):
     try:
         db.session.delete(User.query.get_or_404(user_id))
         db.session.commit()
+        flash('Success: user deleted', 'success')
     except exc.SQLAlchemyError:
+        flash('Failed to delete user', 'danger')
         return redirect(url_for('users_view'))
     return redirect(url_for('users_view'))
 
@@ -151,7 +176,9 @@ def new_post_view(user_id):
             new_post = Post(title=title, content=content, user_id=user_id)
             db.session.add(new_post)
             db.session.commit()
+            flash('Success: post created!', 'success')
         except exc.SQLAlchemyError:
+            flash('Failed to create post', 'danger')
             return redirect(url_for('new_post_view', user_id=user_id))
         return redirect(url_for('user_detail_view', user_id=user_id))
 
@@ -190,7 +217,9 @@ def edit_post_view(post_id):
             post.content = content
             db.session.add(post)
             db.session.commit()
+            flash('Success: post updated!', 'success')
         except exc.SQLAlchemyError:
+            flash('Failed to update post', 'danger')
             return redirect(url_for('edit_post_view', post_id=post_id))
         return redirect(url_for('post_detail_view', post_id=post_id))
 
@@ -207,6 +236,8 @@ def delete_post(post_id):
         post = Post.query.get_or_404(post_id)
         db.session.delete(post)
         db.session.commit()
+        flash('Success: post deleted!', 'success')
     except exc.SQLAlchemyError:
+        flash('Failed to delete post', 'danger')
         return redirect(url_for('post_detail_view', post_id=post_id))
     return redirect(url_for('user_detail_view', user_id=post.user_id))

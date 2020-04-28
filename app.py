@@ -4,7 +4,7 @@ from flask import Flask, redirect, render_template, url_for, request
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy import exc
 
-from models import User, connect_db, db
+from models import User, connect_db, db, Post
 
 app = Flask(__name__)
 # database setup
@@ -70,10 +70,12 @@ def user_detail_view(user_id):
     """
     Display user details (name, image) and buttons to edit or delete user.
     """
+    user = User.query.get_or_404(user_id)
     return render_template(
-        'user_detail.html', user=User.query.get_or_404(user_id),
+        'user_detail.html', user=user,
         edit_url=url_for('edit_user_view', user_id=user_id),
-        delete_url=url_for('delete_user', user_id=user_id)
+        delete_url=url_for('delete_user', user_id=user_id),
+        posts=user.posts, new_post_url=url_for('new_post_view', user_id=user_id)
     )
 
 
@@ -121,3 +123,79 @@ def delete_user(user_id):
             redirect(url_for('users_view'))
         )
     return redirect(url_for('users_view'))
+
+
+@app.route('/users/<int:user_id>/posts/new', methods=['GET', 'POST'])
+def new_post_view(user_id):
+    """
+    GET: Display form for adding a new post.
+    POST:
+        Create new post and commit to db; redirect to user_detail_view if successful,
+        else redirect to this page.
+    """
+    if request.method == 'POST':
+        title = request.form.get('title')
+        content = request.form.get('content')
+        try:
+            new_post = Post(title=title, content=content, user_id=user_id)
+            db.session.add(new_post)
+            db.session.commit()
+        except exc.SQLAlchemyError:
+            return redirect(url_for('new_post_view', user_id=user_id))
+        return redirect(url_for('user_detail_view', user_id=user_id))
+
+    return render_template('new_post.html')
+
+
+@app.route('/posts/<int:post_id>')
+def post_detail_view(post_id):
+    """
+    Display post details (title, content, author) and buttons to edit or delete post.
+    """
+    post = Post.query.get_or_404(post_id)
+    return render_template(
+        'post_detail.html', post=post,
+        user_url=url_for('user_detail_view', user_id=post.user_id),
+        edit_url=url_for('edit_post_view', post_id=post_id),
+        delete_url=url_for('delete_post', post_id=post_id)
+    )
+
+
+@app.route('/posts/<int:post_id>/edit', methods=['GET', 'POST'])
+def edit_post_view(post_id):
+    """
+    GET: Display form for editing the post.
+    POST:
+        Query and update post and commit to db;
+        redirect to post_detail_view if successful,
+        else redirect to this page.
+    """
+    if request.method == 'POST':
+        title = request.form.get('title')
+        content = request.form.get('content')
+        try:
+            post = Post.query.get_or_404(post_id)
+            post.title = title
+            post.content = content
+            db.session.add(post)
+            db.session.commit()
+        except exc.SQLAlchemyError:
+            return redirect(url_for('edit_post_view', post_id=post_id))
+        return redirect(url_for('post_detail_view', post_id=post_id))
+
+    return render_template('edit_post.html', post=Post.query.get(post_id))
+
+
+@app.route('/posts/<int:post_id>/delete', methods=['POST'])
+def delete_post(post_id):
+    """
+    Query and delete post from db; redirect to post_detail_view if succesful
+    else redirect back to this page.
+    """
+    try:
+        post = Post.query.get_or_404(post_id)
+        db.session.delete(post)
+        db.session.commit()
+    except exc.SQLAlchemyError:
+        return redirect(url_for('post_detail_view', post_id=post_id))
+    return redirect(url_for('user_detail_view', user_id=post.user_id))

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %} - New Post {% endblock %}
+
+{% block content %}
+<h1>Create a post</h1>
+<form action="" method="POST">
+    <div class="form-group col-6">
+        <label for="title-input">Title</label>
+        <input type="text" class="form-control" id="title-input" aria-describedby="titleHelp"
+            placeholder="Enter a title" name="title" required>
+    </div>
+    <div class="form-group col-6">
+        <label for="content-input">Content</label>
+        <textarea class="form-control" rows="5" id="content-input" aria-describedby="contentHelp"
+            placeholder="..." name="content" required></textarea>
+    </div>
+    <div class="row col-6 justify-content-center">
+        <div class="col-6">
+            <button type="submit" class="btn btn-primary btn-block">Post</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

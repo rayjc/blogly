@@ -48,9 +48,9 @@ class Post(db.Model):
     title = db.Column(db.String(128), nullable=False, default="No Title")
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.Date, nullable=False, default=datetime.datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'))
 
-    user = db.relationship('User', backref='posts')
+    user = db.relationship('User', backref=db.backref('posts', passive_deletes=True))
 
     def __repr__(self):
         return (f"<Post: id={self.id} "

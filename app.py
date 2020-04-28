@@ -25,7 +25,9 @@ def home_view():
     """
     Home page; redirects to users page.
     """
-    return redirect(url_for('users_view'))
+    return render_template(
+        'home.html', posts=Post.query.order_by(Post.created_at.desc())
+    )
 
 
 @app.route('/users')

@@ -17,7 +17,7 @@ db.drop_all()
 db.create_all()
 
 
-class FlaskTests(TestCase):
+class FlaskUserTests(TestCase):
 
     def setUp(self):
         """Add sample user."""
@@ -98,6 +98,7 @@ class FlaskTests(TestCase):
             resp = client.get(f"/users/{self.user_id}")
             html = resp.get_data(as_text=True)
 
+        self.assertEqual(resp.status_code, 200)
         self.assertIn(f'<img class="card-img-top" src="{self.user_url}"', html)
         self.assertIn(
             '<h2 class="card-title text-center">'
@@ -164,10 +165,9 @@ class FlaskTests(TestCase):
         self.assertEqual(resp.location, f"http://localhost/users")
         self.assertFalse(User.query.get(self.user_id))
 
-    def test_fail_post_delete_user_view(self):
+    def test_missing_post_delete_user_view(self):
         with app.test_client() as client:
             resp = client.post(f"/users/{self.user_id+100}/delete")
         
-        self.assertEqual(resp.status_code, 302)
-        self.assertEqual(resp.location, f"http://localhost/users")
+        self.assertEqual(resp.status_code, 404)
         self.assertFalse(User.query.get(self.user_id+100))

@@ -117,11 +117,7 @@ def delete_user(user_id):
         db.session.delete(User.query.get_or_404(user_id))
         db.session.commit()
     except exc.SQLAlchemyError:
-        return (
-            redirect(url_for('user_detail_view', user_id=user_id))
-            if User.query.get(user_id) else
-            redirect(url_for('users_view'))
-        )
+        return redirect(url_for('users_view'))
     return redirect(url_for('users_view'))
 
 

@@ -1,4 +1,5 @@
 """Blogly application."""
+import datetime
 
 from flask import Flask, redirect, render_template, url_for, request
 from flask_debugtoolbar import DebugToolbarExtension
@@ -19,8 +20,20 @@ app.config['SECRET_KEY'] = "test"
 app.debug = True
 tool_bar = DebugToolbarExtension(app)
 
+@app.template_filter('datetime')
+def format_datetime(value):
+    return datetime.datetime.strftime(value, '%a %b %d %Y, %I:%M %p')
 
 @app.route('/')
+def index_view():
+    """
+    Index page: /home, /users
+    """
+    return render_template(
+        'index.html'
+    )
+
+@app.route('/home')
 def home_view():
     """
     Home page; redirects to users page.

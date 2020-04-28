@@ -33,7 +33,10 @@
 <h2>Posts</h2>
 <ul>
     {% for post in posts %}
-    <li><a href="{{url_for('post_detail_view', post_id=post.id)}}">{{post.title}}</a></li>
+    <li>
+        <a href="{{url_for('post_detail_view', post_id=post.id)}}">{{post.title}}</a>
+        on {{post.created_at|datetime}}
+    </li>
     {% endfor %}
 </ul>
 <a href="{{new_post_url}}" class="btn btn-secondary">Add Post</a>

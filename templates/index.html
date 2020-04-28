@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %} - Index {% endblock %}
+
+{% block content %}
+<h1>Index</h1>
+<ul>
+    <li><a href="{{url_for('home_view')}}">Home</a></li>
+    <li><a href="{{url_for('users_view')}}">Users</a></li>
+</ul>
+{% endblock %}

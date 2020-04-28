@@ -13,6 +13,7 @@
                 <p class="card-text">{{post.content}}</p>
                 <h6 class="card-subtitle my-2 text-muted text-right">
                     by <a href="{{url_for('user_detail_view', user_id=post.user.id)}}">{{post.user.full_name}}</a>
+                    on {{ post.created_at|datetime }}
                 </h6>
             </div>
         </div>

@@ -35,7 +35,12 @@
     {% for post in posts %}
     <li>
         <a href="{{url_for('post_detail_view', post_id=post.id)}}">{{post.title}}</a>
-        on {{post.created_at|datetime}}
+        <p>
+            {% for tag in post.tags %}
+            <span class="badge badge-info">{{tag.name}}</span>
+            {% endfor %}
+            on {{post.created_at|datetime}}
+        </p>
     </li>
     {% endfor %}
 </ul>

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %} - Edit Tag {% endblock %}
+
+{% block content %}
+<h1>Edit a tag</h1>
+<form action="" method="POST" class="justify-content-center">
+    <div class="form-group row">
+        <label class="col-form-label col-md-1" for="name-input">Name</label>
+        <div class="col-sm-6">
+            <input type="text" class="form-control" id="name-input" aria-describedby="nameHelp"
+                value="{{tag.name}}" name="name" required>
+        </div>
+    </div>
+    <div class="form-group">
+        {% for post in posts %}
+        <div class="form-check col-6">
+            {% if post.id in checked_post_ids %}
+            <input class="form-check-input" type="checkbox" name="posts" value="{{post.id}}" id="post-{{post.title}}" checked>
+            {% else %}
+            <input class="form-check-input" type="checkbox" name="posts" value="{{post.id}}" id="post-{{post.title}}">
+            {% endif %}
+            <label class="form-check-label" for="post-{{post.title}}">{{post.title}}</label>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="row col-6 justify-content-between">
+        <div class="col-6">
+            <a href="{{url_for('tag_detail_view', tag_id=tag.id)}}"
+                class="btn btn-outline-success btn-block">Cancel</a>
+        </div>
+        <div class="col-6">
+            <button type="submit" class="btn btn-success btn-block">Save</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

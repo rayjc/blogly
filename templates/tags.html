@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %} - Tags {% endblock %}
+
+{% block content %}
+<h1>Tags</h1>
+<ul>
+    {% for tag in tags %}
+    <li>
+        <a href="{{url_for('tag_detail_view', tag_id=tag.id)}}">{{tag.name}}</a>
+    </li>
+    {% endfor %}
+</ul>
+<a href="{{url_for('new_tag_view')}}" class="btn btn-secondary">Add Tag</a>
+
+<hr>
+<div class="text-center">
+    <a href="{{url_for('home_view')}}">Home</a>
+</div>
+{% endblock %}

@@ -6,7 +6,7 @@
 <h1 class="text-center">Blogly Recent Posts</h1>
 <div class="row justify-content-center">
     {% for post in posts %}
-    <div class="col-md-6 my-3">
+    <div class="col-md-6 my-3 align-self-center">
         <div class="card">
             <div class="card-body">
                 <h3 class="card-title text-center">{{post.title}}</h3>
@@ -15,6 +15,13 @@
                     by <a href="{{url_for('user_detail_view', user_id=post.user.id)}}">{{post.user.full_name}}</a>
                     on {{ post.created_at|datetime }}
                 </h6>
+                <p class="card-subtitle my-2 text-right">
+                    {% for tag in post.tags %}
+                    <a href="{{url_for('tag_detail_view', tag_id=tag.id)}}">
+                        <span class="badge badge-info">{{tag.name}}</span>
+                    </a>
+                    {% endfor %}
+                </p>
             </div>
         </div>
     </div>
@@ -23,5 +30,7 @@
 
 <div class="text-center">
     <a href="{{url_for('home_view')}}">Home</a>
+    |
+    <a href="{{url_for('index_view')}}">Index</a>
 </div>
 {% endblock %}

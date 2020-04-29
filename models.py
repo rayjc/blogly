@@ -47,7 +47,7 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(128), nullable=False, default="No Title")
     content = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.Date, nullable=False, default=datetime.datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'))
 
     user = db.relationship('User', backref=db.backref('posts', passive_deletes=True))
